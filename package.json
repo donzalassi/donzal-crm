@@ -1,0 +1,17 @@
+{
+  "name": "crm-sms-backend",
+  "version": "1.0.0",
+  "description": "돼지갈비집 CRM 시스템 문자 발송을 위한 통합 백엔드",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "coolsms-node-sdk": "^2.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "localtunnel": "^2.0.2"
+  }
+}

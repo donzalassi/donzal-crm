@@ -1,0 +1,100 @@
+{
+  "owners": [
+    {
+      "id": "owner_admin",
+      "email": "shsh3@naver.com",
+      "password": "admin",
+      "storeName": "돈잘베어 본점 (관리자)",
+      "status": "Active",
+      "name": "관리자",
+      "joinDate": "2026-04-20"
+    },
+    {
+      "id": "owner_1",
+      "email": "test@donzal.com",
+      "password": "password123",
+      "storeName": "돈잘베어 본점",
+      "status": "Active",
+      "joinDate": "2026-04-10"
+    },
+    {
+      "id": "owner_3",
+      "email": "aceshsh3@gmail.com",
+      "password": "1qaz1qaz!!",
+      "storeName": "의정부떡갈비",
+      "status": "Active",
+      "joinDate": "2026-04-20"
+    },
+    {
+      "id": "owner_4",
+      "email": "test_user@email.com",
+      "password": "12345678",
+      "storeName": "Store X",
+      "status": "Active",
+      "joinDate": "2026-04-20"
+    }
+  ],
+  "customers": [
+    {
+      "ownerId": "owner_1",
+      "Phone": "010-1234-5678",
+      "Name": "김단골",
+      "Region": "의정부",
+      "BirthYear": 1985,
+      "Gender": "남성",
+      "JoinDate": "2026-04-11"
+    },
+    {
+      "Phone": "01090114620",
+      "Name": "돈잘",
+      "Region": "의정부",
+      "AgeGroup": "40대",
+      "Gender": "남성",
+      "JoinDate": "2026-04-20",
+      "ownerId": "owner_3"
+    },
+    {
+      "Phone": "01090114620",
+      "Name": "돈잘돈가스",
+      "Region": "의정부",
+      "AgeGroup": "40대",
+      "Gender": "남성",
+      "JoinDate": "2026-04-20",
+      "ownerId": "owner_admin"
+    }
+  ],
+  "visits": [
+    {
+      "ownerId": "owner_1",
+      "VisitID": "V001",
+      "Phone": "010-1234-5678",
+      "VisitDate": "2026-04-15",
+      "SpendAmount": 50000,
+      "IsFirstVisit": true
+    },
+    {
+      "VisitID": "V526510",
+      "Phone": "01090114620",
+      "VisitDate": "2026-04-20",
+      "SpendAmount": 40000,
+      "IsFirstVisit": true,
+      "ownerId": "owner_3"
+    },
+    {
+      "VisitID": "V874288",
+      "Phone": "01090114620",
+      "VisitDate": "2026-04-20",
+      "SpendAmount": 20000,
+      "IsFirstVisit": true,
+      "ownerId": "owner_admin"
+    }
+  ],
+  "config": {
+    "owner_1": {
+      "storeName": "돈잘베어 본점",
+      "senderNumber": "01012345678",
+      "apiKey": "",
+      "apiSecret": ""
+    }
+  }
+}
