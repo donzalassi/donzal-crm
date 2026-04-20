@@ -35,15 +35,22 @@ async function syncData() {
         const nameEl = document.getElementById('current-owner-name');
         const statusEl = document.getElementById('current-subscription-status');
         
-        // [수정] 관리자 계정 여부에 따른 이름 표시 분기
+        // [수정] 관리자 계정 여부에 따른 이름 표시 분기 (더 직관적으로 개선)
         const isAdmin = currentOwner.email === 'shsh3@naver.com';
         if (nameEl) {
-          nameEl.textContent = isAdmin ? '시스템 마스터' : (currentOwner.name || '사장님') + ' 사장님';
+          if (isAdmin) {
+            nameEl.textContent = '시스템 마스터 (관리자)';
+            nameEl.style.color = 'var(--accent-gold)';
+            nameEl.style.fontWeight = '800';
+          } else {
+            nameEl.textContent = (currentOwner.name || currentOwner.storeName || '사장님') + ' 사장님';
+            nameEl.style.color = '#fff';
+          }
         }
         
         if (statusEl) {
-          statusEl.textContent = isAdmin ? '마스터 권한' : (currentOwner.status === 'Active' ? '구독 활성' : '승인 대기/만료');
-          statusEl.style.color = currentOwner.status === 'Active' ? '#4ade80' : (isAdmin ? '#d4af37' : '#f87171');
+          statusEl.textContent = isAdmin ? '최상위 관리 권한' : (currentOwner.status === 'Active' ? '구독 활성' : '승인 대기/만료');
+          statusEl.style.color = currentOwner.status === 'Active' ? '#4ade80' : (isAdmin ? 'var(--accent-gold)' : '#f87171');
         }
         
         // Master Admin Check
@@ -492,10 +499,13 @@ function renderCustomerTable(data) {
         <td><span class="status-badge ${c.status}">${c.statusLabel}</span></td>
         <td>
           <div style="display:flex; gap:5px;">
-            <button class="action-sm-btn" onclick="openEditModal('${c.Phone}')">⚙️</button>
+            <button class="action-sm-btn" onclick="openEditModal('${c.Phone}')" title="정보 수정">⚙️</button>
             ${c.isExcluded 
               ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'reset')" style="background:var(--accent-success); color:#000">타겟복원</button>`
-              : `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 대상에서 제외" style="background:rgba(239, 68, 68, 0.1); color:var(--accent-danger)">타겟제외</button>`
+              : (c.status === 'normal' || c.status === 'new'
+                  ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'include', 'vip')" style="background:rgba(212, 175, 55, 0.1); color:var(--accent-gold)">+VIP타겟</button>`
+                  : `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 대상에서 제외" style="background:rgba(239, 68, 68, 0.1); color:var(--accent-danger)">타겟제외</button>`
+                )
             }
           </div>
         </td>
@@ -816,6 +826,19 @@ async function saveConfig() {
 
   // 2. 서버 저장
   showToast('설정 저장 중... ⏳');
+  
+  // 사장님 이름 정보도 업데이트 요청 (SaaS 고도화)
+  try {
+    await fetch('/api/admin/update-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        ownerId: currentOwnerId, 
+        name: storeName // 여기서는 매장 이름을 사장님 표시 기본 명칭으로 활용
+      })
+    });
+  } catch(e) { console.warn('Profile update fail:', e); }
+
   await persistData({ config: dbConfig });
   showToast('✅ 환경설정이 저장되었습니다.');
 

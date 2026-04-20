@@ -178,6 +178,24 @@ app.post('/api/admin/update-status', (req, res) => {
 });
 
 
+// [사용자/관리자] 사장님 프로필 정보 업데이트 (이름 등)
+app.post('/api/admin/update-profile', (req, res) => {
+  try {
+    const { ownerId, name } = req.body;
+    let db = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    
+    const owner = db.owners.find(o => o.id === ownerId);
+    if (!owner) return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+
+    if (name) owner.name = name;
+    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf-8');
+    
+    res.json({ success: true, message: '프로필 정보가 업데이트되었습니다.' });
+  } catch(e) {
+    res.status(500).json({ success: false, message: '프로필 업데이트 실패' });
+  }
+});
+
 // 문자 발송 API 연동 엔드포인트
 app.post('/send-sms', async (req, res) => {
   const { targets, text, config } = req.body; 

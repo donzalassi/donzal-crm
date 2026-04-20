@@ -36,15 +36,6 @@
   ],
   "customers": [
     {
-      "ownerId": "owner_1",
-      "Phone": "010-1234-5678",
-      "Name": "김단골",
-      "Region": "의정부",
-      "BirthYear": 1985,
-      "Gender": "남성",
-      "JoinDate": "2026-04-11"
-    },
-    {
       "Phone": "01090114620",
       "Name": "돈잘",
       "Region": "의정부",
@@ -61,17 +52,27 @@
       "Gender": "남성",
       "JoinDate": "2026-04-20",
       "ownerId": "owner_admin"
+    },
+    {
+      "ownerId": "owner_1",
+      "Phone": "010-1234-5678",
+      "Name": "김단골",
+      "Region": "의정부",
+      "BirthYear": 1985,
+      "Gender": "남성",
+      "JoinDate": "2026-04-11"
+    },
+    {
+      "Phone": "01090114620",
+      "Name": "김돈자",
+      "Region": "서울",
+      "AgeGroup": "40대",
+      "Gender": "여성",
+      "JoinDate": "2026-04-20",
+      "ownerId": "owner_1"
     }
   ],
   "visits": [
-    {
-      "ownerId": "owner_1",
-      "VisitID": "V001",
-      "Phone": "010-1234-5678",
-      "VisitDate": "2026-04-15",
-      "SpendAmount": 50000,
-      "IsFirstVisit": true
-    },
     {
       "VisitID": "V526510",
       "Phone": "01090114620",
@@ -87,6 +88,22 @@
       "SpendAmount": 20000,
       "IsFirstVisit": true,
       "ownerId": "owner_admin"
+    },
+    {
+      "ownerId": "owner_1",
+      "VisitID": "V001",
+      "Phone": "010-1234-5678",
+      "VisitDate": "2026-04-15",
+      "SpendAmount": 50000,
+      "IsFirstVisit": true
+    },
+    {
+      "VisitID": "V843571",
+      "Phone": "01090114620",
+      "VisitDate": "2026-04-20",
+      "SpendAmount": 48000,
+      "IsFirstVisit": true,
+      "ownerId": "owner_1"
     }
   ],
   "config": {
