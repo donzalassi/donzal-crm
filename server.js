@@ -256,7 +256,7 @@ app.post('/send-sms', async (req, res) => {
     console.error('Logging to data.json failed:', logErr);
   }
 
-  res.json({ success, status, response });
+  res.json({ success, status, message: status, response });
 });
 
 // 6. 문자 발송 이력 조회 API
