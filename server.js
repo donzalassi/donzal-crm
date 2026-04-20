@@ -222,10 +222,13 @@ app.post('/send-sms', async (req, res) => {
     if (config.apiKey === 'YOUR_API_KEY' || config.apiKey === '') {
       return res.json({ success: true, message: '시뮬레이션 성공' });
     }
-    const result = await msg.send(messageList);
-    res.json({ success: true, message: '발송 성공', data: result });
+    const response = await msg.send(messageList);
+    res.json({ success: true, response });
   } catch (error) {
-    res.status(500).json({ success: false, message: '발송 실패', error: error.message });
+    console.error('SMS Send Error Details:', error);
+    // 솔라피 상세 에러 메시지가 있으면 그것을, 없으면 일반 에러를 보냅니다.
+    const errorMsg = error.errorMessage || error.message || '문자 발송 중 알 수 없는 오류 발생';
+    res.status(500).json({ success: false, message: errorMsg });
   }
 });
 

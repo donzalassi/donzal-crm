@@ -753,26 +753,31 @@ async function sendTargetSMS(type) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`[성공] ${targetCount}명에게 API 연동 문자 발송 완료! 🎉`);
-      const log = document.getElementById('send-log');
-      if (log) {
-        const el = document.createElement('div');
-        el.className = 'log-item';
-        el.innerHTML = `
-          <div>
-            <div style="font-weight:bold;margin-bottom:5px;">${type==='vip'?'👑 VIP':'💤 휴면'} 쿠폰 발송</div>
-            <div style="font-size:12px;color:var(--text-muted)">${new Date().toLocaleString()} | 대상: ${targetCount}명</div>
-          </div>
-          <span class="badge" style="background:var(--accent-success);color:#000">발송완료</span>
-        `;
-        log.prepend(el);
-      }
+      showToast(`[성공] ${targetCount}명에게 문자 발송 요청 완료! 🎉`);
+      addLogToUI(type, targetCount, '발송완료', 'var(--accent-success)');
     } else {
-      showToast('❌ 오류: ' + data.message);
+      showToast(`❌ 발송 실패: ${data.message}`);
+      addLogToUI(type, targetCount, `실패: ${data.message}`, 'var(--accent-danger)');
     }
   } catch(e) {
-    showToast('🚨 백엔드 서버 연결 실패! server.js를 확인하세요.');
+    showToast('🚨 백엔드 서버 연결 실패! 네트워크를 확인하세요.');
+    addLogToUI(type, targetCount, '연결오류', 'var(--accent-danger)');
   }
+}
+
+function addLogToUI(type, count, status, color) {
+  const log = document.getElementById('send-log');
+  if (!log) return;
+  const el = document.createElement('div');
+  el.className = 'log-item';
+  el.innerHTML = `
+    <div>
+      <div style="font-weight:bold;margin-bottom:5px; color:${color}">${type==='vip'?'👑 VIP':'💤 휴면'} 캠페인</div>
+      <div style="font-size:12px;color:var(--text-muted)">${new Date().toLocaleString()} | 대상: ${count}명 | 결과: ${status}</div>
+    </div>
+    <span class="badge" style="background:${color}; color:#000; font-size:10px; padding:2px 8px; border-radius:4px;">${status}</span>
+  `;
+  log.prepend(el);
 }
 
 // ===== 4. 신규/기존 등록 및 결제 로직 (SaaS) =====
