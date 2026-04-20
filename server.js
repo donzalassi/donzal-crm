@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { msg } = require('coolsms-node-sdk');
+const coolsms = require('coolsms-node-sdk');
 const path = require('path');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
@@ -212,7 +212,7 @@ app.post('/send-sms', async (req, res) => {
   const { targets, text, config, ownerId, type } = req.body; 
   if (!targets || targets.length === 0 || !text) return res.status(400).json({ success: false, message: '데이터 부족' });
 
-  msg.init({ apiKey: config.apiKey, apiSecret: config.apiSecret });
+  const messageService = new coolsms.default(config.apiKey, config.apiSecret);
   const messageList = targets.map(t => ({
     to: t.phone.replace(/-/g, ''), 
     from: config.senderNumber,
@@ -225,7 +225,7 @@ app.post('/send-sms', async (req, res) => {
 
   try {
     if (config.apiKey !== 'YOUR_API_KEY' && config.apiKey !== '') {
-      response = await msg.send(messageList);
+      response = await messageService.sendMany(messageList);
       status = '발송완료';
     } else {
       status = '시뮬레이션 성공';
