@@ -606,45 +606,14 @@ function updateVisitsPage() {
 // 타겟 마케팅 페이지 렌더링
 function updateTargetingPage() {
   const analyzed = getAnalyzedData();
-  
-  // VIP 타겟 분리: 수동 추가(manualInclusions) vs 자동 추천
-  const vipsAll = analyzed.filter(c => c.status === 'vip');
-  const vipsManual = vipsAll.filter(c => c.isManualTarget);
-  const vipsAuto = vipsAll.filter(c => !c.isManualTarget);
-  
-  // 휴면 타겟 분리: 수동 추가 vs 자동 추천
-  const dormantsAll = analyzed.filter(c => c.status === 'dormant');
-  const dormantsManual = dormantsAll.filter(c => c.isManualTarget);
-  const dormantsAuto = dormantsAll.filter(c => !c.isManualTarget);
+  const vips = analyzed.filter(c => c.status === 'vip');
+  const dormants = analyzed.filter(c => c.status === 'dormant');
   
   const vt = document.getElementById('vip-target-list');
   const vMsg = document.getElementById('target-msg-vip');
   if (vt) {
-    if (vMsg && !vMsg.value) vMsg.value = dbConfig.vipTemplate || `🥩 [${dbConfig.storeName}] 우수 고객님께!\n5만원 상당의 프리미엄 고기 추가 쿠폰을 드립니다 🎁\n다음 방문 시 직원에게 문자 제시 (유효기간: 이달말)`;
-    
-    let html = '';
-    
-    // 1. 직접 추가된 명단 (강조)
-    if (vipsManual.length > 0) {
-      html += `<div style="padding:5px 10px; font-size:12px; color:var(--accent-gold); border-bottom:1px solid rgba(212,175,55,0.2); margin-bottom:5px;">⭐ 사장님이 직접 추가한 명단</div>`;
-      html += vipsManual.map(c => `
-        <div class="t-item manual">
-          <label style="display:flex; align-items:center; cursor:pointer;">
-            <input type="checkbox" class="target-chk-vip" value="${c.Phone}" checked style="margin-right:8px; accent-color:var(--accent-gold); width:16px; height:16px;">
-            <span style="color:var(--accent-gold)">${c.Name} (직접추가)</span>
-          </label>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <button onclick="toggleManualTarget('${c.Phone}', 'reset')" title="직접 추가 목록에서 제거" style="background:rgba(248, 113, 113, 0.2); border:none; border-radius:4,px; padding:2px 6px; cursor:pointer; font-size:12px; color:#f87171">기본으로 되돌리기</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // 2. 자동 추천 명단
-    if (vipsAuto.length > 0) {
-      if (vipsManual.length > 0) html += `<div style="height:15px;"></div>`;
-      html += `<div style="padding:5px 10px; font-size:12px; color:var(--text-muted);">🤖 시스템 자동 추천 명단</div>`;
-      html += vipsAuto.map(c => `
+    if (vMsg) vMsg.value = dbConfig.vipTemplate || `🥩 [${dbConfig.storeName}] 우수 고객님께!\n5만원 상당의 프리미엄 고기 추가 쿠폰을 드립니다 🎁\n다음 방문 시 직원에게 문자 제시 (유효기간: 이달말)`;
+      vips.map(c => `
         <div class="t-item">
           <label style="display:flex; align-items:center; cursor:pointer;">
             <input type="checkbox" class="target-chk-vip" value="${c.Phone}" checked style="margin-right:8px; accent-color:var(--accent-gold); width:16px; height:16px;">
@@ -656,39 +625,14 @@ function updateTargetingPage() {
           </div>
         </div>
       `).join('');
-    }
-
-    vt.innerHTML = html || '<div class="t-item" style="justify-content:center;color:#999">대상이 없습니다</div>';
   }
   
   const dt = document.getElementById('dormant-target-list');
   const dMsg = document.getElementById('target-msg-dormant');
   if (dt) {
-    if (dMsg && !dMsg.value) dMsg.value = dbConfig.dormantTemplate || `🔥 [${dbConfig.storeName}] 보고 싶었어요!\n재방문 시 불고기 2인분 서비스 🎁\n이번 주말 오시면 특별히 대접해 드릴게요!`;
-    
-    let html = '';
-
-    // 1. 직접 추가된 명단
-    if (dormantsManual.length > 0) {
-      html += `<div style="padding:5px 10px; font-size:12px; color:var(--accent-blue); border-bottom:1px solid rgba(59,130,246,0.2); margin-bottom:5px;">⭐ 사장님이 직접 추가한 명단</div>`;
-      html += dormantsManual.map(c => `
-        <div class="t-item manual">
-          <label style="display:flex; align-items:center; cursor:pointer;">
-            <input type="checkbox" class="target-chk-dormant" value="${c.Phone}" checked style="margin-right:8px; accent-color:var(--accent-blue); width:16px; height:16px;">
-            <span style="color:var(--accent-blue)">${c.Name} (직접추가)</span>
-          </label>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <button onclick="toggleManualTarget('${c.Phone}', 'reset')" title="직접 추가 목록에서 제거" style="background:rgba(248, 113, 113, 0.2); border:none; border-radius:4px; padding:2px 6px; cursor:pointer; font-size:12px; color:#f87171">기본으로 되돌리기</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // 2. 자동 추천 명단
-    if (dormantsAuto.length > 0) {
-      if (dormantsManual.length > 0) html += `<div style="height:15px;"></div>`;
-      html += `<div style="padding:5px 10px; font-size:12px; color:var(--text-muted);">🤖 시스템 자동 추천 명단</div>`;
-      html += dormantsAuto.map(c => `
+    if (dMsg) dMsg.value = dbConfig.dormantTemplate || `🔥 [${dbConfig.storeName}] 보고 싶었어요!\n재방문 시 불고기 2인분 서비스 🎁\n이번 주말 오시면 특별히 대접해 드릴게요!`;
+    dt.innerHTML = dormants.length === 0 ? '<div class="t-item" style="justify-content:center;color:#999">대상이 없습니다</div>' :
+      dormants.map(c => `
         <div class="t-item">
           <label style="display:flex; align-items:center; cursor:pointer;">
             <input type="checkbox" class="target-chk-dormant" value="${c.Phone}" checked style="margin-right:8px; accent-color:var(--accent-blue); width:16px; height:16px;">
@@ -700,9 +644,6 @@ function updateTargetingPage() {
           </div>
         </div>
       `).join('');
-    }
-
-    dt.innerHTML = html || '<div class="t-item" style="justify-content:center;color:#999">대상이 없습니다</div>';
   }
 }
 
