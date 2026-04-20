@@ -206,6 +206,8 @@ function updateUIAfterSync() {
   document.getElementById('config-sender').value = dbConfig.senderNumber;
   document.getElementById('config-api-key').value = dbConfig.apiKey;
   document.getElementById('config-api-secret').value = dbConfig.apiSecret;
+  document.getElementById('config-vip-template').value = dbConfig.vipTemplate || '';
+  document.getElementById('config-dormant-template').value = dbConfig.dormantTemplate || '';
   
   // 처음 로그인 시 대시보드 렌더링
   updateDashboard();
@@ -447,7 +449,8 @@ function filterCustomers(type) {
     smsPanel.style.display = 'block';
     smsIcon.textContent = '👑';
     smsTitle.textContent = 'VIP 타겟 마케팅 (고기 쿠폰)';
-    smsMsg.innerHTML = `[${dbConfig.storeName}] 우수 고객님께!<br/>5만원 상당의 고기 추가 쿠폰을 드립니다.<br/>다음 방문 시 제시해주세요.`;
+    const vipTmp = dbConfig.vipTemplate || `[${dbConfig.storeName}] 우수 고객님께!<br/>5만원 상당의 고기 추가 쿠폰을 드립니다.<br/>다음 방문 시 제시해주세요.`;
+    smsMsg.innerHTML = vipTmp.replace(/\n/g, '<br/>');
     smsCnt.textContent = `대상: 총 ${result.length}명`;
     document.getElementById('send-btn').style.background = 'linear-gradient(135deg, var(--accent-gold), #b38f00)';
     document.getElementById('send-btn').style.color = '#000';
@@ -461,7 +464,8 @@ function filterCustomers(type) {
     smsPanel.style.display = 'block';
     smsIcon.textContent = '💤';
     smsTitle.textContent = '휴면 타겟 마케팅 (컴백 쿠폰)';
-    smsMsg.innerHTML = `[${dbConfig.storeName}] 보고 싶었어요!<br/>재방문 시 불고기 2인분을 서비스로 대접해 드릴게요!<br/>이번 주말 꼭 들러주세요.`;
+    const dormantTmp = dbConfig.dormantTemplate || `[${dbConfig.storeName}] 보고 싶었어요!<br/>재방문 시 불고기 2인분을 서비스로 대접해 드릴게요!<br/>이번 주말 꼭 들러주세요.`;
+    smsMsg.innerHTML = dormantTmp.replace(/\n/g, '<br/>');
     smsCnt.textContent = `대상: 총 ${result.length}명`;
     document.getElementById('send-btn').style.background = 'linear-gradient(135deg, var(--accent-blue), #2980b9)';
     document.getElementById('send-btn').style.color = '#fff';
@@ -656,8 +660,8 @@ async function sendTargetSMS(type) {
   }
 
   let text = '';
-  if(type === 'vip') text = `🥩 [${config.storeName}] 우수 고객님께!\\n5만원 상당의 프리미엄 고기 추가 쿠폰을 드립니다 🎁\\n다음 방문 시 직원에게 문자 제시 (유효기간: 이달말)`;
-  if(type === 'dormant') text = `🔥 [${config.storeName}] 보고 싶었어요!\\n재방문 시 불고기 2인분 서비스 🎁\\n이번 주말 오시면 특별히 대접해 드릴게요!`;
+  if(type === 'vip') text = config.vipTemplate || `🥩 [${config.storeName}] 우수 고객님께!\n5만원 상당의 프리미엄 고기 추가 쿠폰을 드립니다 🎁\n다음 방문 시 직원에게 문자 제시 (유효기간: 이달말)`;
+  if(type === 'dormant') text = config.dormantTemplate || `🔥 [${config.storeName}] 보고 싶었어요!\n재방문 시 불고기 2인분 서비스 🎁\n이번 주말 오시면 특별히 대접해 드릴게요!`;
 
   showToast('문자 발송 요청 중입니다... ⏳');
   
@@ -868,6 +872,8 @@ async function saveConfig() {
   const senderNumber = document.getElementById('config-sender').value;
   const apiKey = document.getElementById('config-api-key').value;
   const apiSecret = document.getElementById('config-api-secret').value;
+  const vipTemplate = document.getElementById('config-vip-template').value;
+  const dormantTemplate = document.getElementById('config-dormant-template').value;
 
   if(!storeName || !senderNumber) {
     showToast('가게 이름과 발신 번호는 필수입니다.');
@@ -879,6 +885,8 @@ async function saveConfig() {
   dbConfig.senderNumber = senderNumber;
   dbConfig.apiKey = apiKey;
   dbConfig.apiSecret = apiSecret;
+  dbConfig.vipTemplate = vipTemplate;
+  dbConfig.dormantTemplate = dormantTemplate;
 
   // 2. 서버 저장
   showToast('설정 저장 중... ⏳');

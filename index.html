@@ -70,7 +70,7 @@
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">
-          <img src="donzal_bear.png" alt="돈잘베어" class="logo-image">
+          <img src="donzal_bear.PNG" alt="돈잘베어" class="logo-image">
       </div>
       <div class="logo-text">
         <span class="logo-title">돈잘<span>단골비서</span></span>
@@ -582,6 +582,21 @@
           <div class="form-group full-width">
             <label class="form-label">API Secret Key *</label>
             <input type="password" id="config-api-secret" class="form-input" placeholder="OQG8J0..." />
+          </div>
+        </div>
+
+        <div class="form-divider" style="margin-top:30px;">마케팅 메시지 템플릿 설정</div>
+        <div style="background:rgba(212,175,55,0.05); padding:15px; border-radius:8px; border-left:4px solid var(--accent-gold); font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.6;">
+          기본 메시지 내용을 자유롭게 수정하세요. 문자 발송 시 <b>[이름]</b> 부분은 자동으로 각 고객의 성함으로 바뀌어 전송됩니다.
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">👑 VIP 타겟 메시지 (고객용)</label>
+            <textarea id="config-vip-template" class="form-input" style="height:100px; resize:vertical; padding:12px;" placeholder="[이름] 우수 고객님께! ..."></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">💤 휴면 타겟 메시지 (컴백용)</label>
+            <textarea id="config-dormant-template" class="form-input" style="height:100px; resize:vertical; padding:12px;" placeholder="[이름] 보고 싶었어요! ..."></textarea>
           </div>
         </div>
 

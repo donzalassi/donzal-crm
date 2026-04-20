@@ -78,7 +78,9 @@ app.post('/api/data/load', async (req, res) => {
           storeName: config?.store_name || '매장',
           senderNumber: config?.sender_number || '',
           apiKey: config?.api_key || '',
-          api_secret: config?.api_secret || ''
+          apiSecret: config?.api_secret || '',
+          vipTemplate: config?.vip_template || '',
+          dormantTemplate: config?.dormant_template || ''
         },
         owner: owner
       }
@@ -134,7 +136,9 @@ app.post('/api/data/save', async (req, res) => {
         store_name: config.storeName,
         sender_number: config.senderNumber,
         api_key: config.apiKey,
-        api_secret: config.apiSecret
+        api_secret: config.apiSecret,
+        vip_template: config.vipTemplate,
+        dormant_template: config.dormantTemplate
       };
       const { error } = await supabase.from('config').upsert(dbConfig);
       if (error) throw error;
