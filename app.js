@@ -270,7 +270,8 @@ function getAnalyzedData() {
       statusLabel,
       totalVisits: cVisits.length,
       recent30DayVisits,
-      isExcluded
+      isExcluded,
+      isManualTarget: !!manualEntry
     };
   });
 }
@@ -473,6 +474,51 @@ function filterCustomers(type) {
   renderCustomerTable(result);
 }
 
+let activePickerGroup = 'vip';
+
+function openTargetPicker(group) {
+  activePickerGroup = group;
+  const title = document.getElementById('picker-title');
+  title.textContent = group === 'vip' ? '👑 VIP 대상 직접 추가' : '💤 휴면 대상 직접 추가';
+  document.getElementById('picker-search').value = '';
+  document.getElementById('modal-target-picker').classList.add('active');
+  renderPickerList();
+}
+
+function renderPickerList() {
+  const query = document.getElementById('picker-search').value.toLowerCase();
+  const list = document.getElementById('picker-list');
+  const all = getAnalyzedData();
+  
+  // 현재 이미 해당 그룹인 사람 제외하고 검색
+  const filtered = all.filter(c => {
+    const isAlreadyInGroup = c.status === activePickerGroup;
+    const matchesQuery = c.Name.toLowerCase().includes(query) || c.Phone.includes(query);
+    return !isAlreadyInGroup && matchesQuery;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div>
+        <div style="font-weight:bold;">${c.Name}</div>
+        <div style="font-size:12px; color:#999;">${c.Phone} | ${c.Region}</div>
+      </div>
+      <button class="action-sm-btn" onclick="addSelectedToTarget('${c.Phone}')" style="background:var(--accent-success); color:#fff; padding:5px 10px;">추가</button>
+    </div>
+  `).join('');
+}
+
+async function addSelectedToTarget(phone) {
+  await toggleManualTarget(phone, 'include', activePickerGroup);
+  closeModal('modal-target-picker');
+  updateTargetingPage();
+}
+
 function renderCustomerTable(data) {
   const tb = document.getElementById('customer-tbody');
   if (!tb) return;
@@ -501,11 +547,18 @@ function renderCustomerTable(data) {
           <div style="display:flex; gap:5px;">
             <button class="action-sm-btn" onclick="openEditModal('${c.Phone}')" title="정보 수정">⚙️</button>
             ${c.isExcluded 
-              ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'reset')" style="background:var(--accent-success); color:#000">타겟복원</button>`
-              : (c.status === 'normal' || c.status === 'new'
-                  ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'include', 'vip')" style="background:rgba(212, 175, 55, 0.1); color:var(--accent-gold)">+VIP타겟</button>`
-                  : `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 대상에서 제외" style="background:rgba(239, 68, 68, 0.1); color:var(--accent-danger)">타겟제외</button>`
+              ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'reset')" style="background:var(--accent-blue); color:#fff">설정초기화</button>`
+              : (c.isManualTarget 
+                  ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'reset')" style="background:var(--accent-blue); color:#fff">설정초기화</button>`
+                  : (c.status === 'normal' || c.status === 'new'
+                      ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'include', 'vip')" style="background:rgba(212, 175, 55, 0.1); color:var(--accent-gold)">+VIP지정</button>`
+                      : `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 대상에서 제외" style="background:rgba(239, 68, 68, 0.1); color:var(--accent-danger)">타겟제외</button>`
+                    )
                 )
+            }
+            ${(!c.isExcluded && (c.status === 'vip' || c.status === 'dormant')) 
+              ? `<button class="action-sm-btn" onclick="toggleManualTarget('${c.Phone}', 'exclude')" style="background:rgba(239, 68, 68, 0.1); color:var(--accent-danger)" title="마케팅 제외">타겟제외</button>` 
+              : ''
             }
           </div>
         </td>
@@ -559,7 +612,10 @@ function updateTargetingPage() {
             <input type="checkbox" class="target-chk-vip" value="${c.Phone}" checked style="margin-right:8px; accent-color:var(--accent-gold); width:16px; height:16px;">
             <span>${c.Name} (${c.Phone.slice(-4)})</span>
           </label>
-          <span style="color:var(--accent-gold)">${formatMoney(c.totalSpend)}</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="color:var(--accent-gold)">${formatMoney(c.totalSpend)}</span>
+            <button onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 명단에서 제외" style="background:none; border:none; cursor:pointer; font-size:16px; color:#f87171">×</button>
+          </div>
         </div>
       `).join('');
   }
@@ -575,7 +631,7 @@ function updateTargetingPage() {
           </label>
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="color:var(--accent-blue)">${c.daysSinceLastVisit}일 전</span>
-            <button onclick="toggleManualTarget('${c.Phone}', 'exclude')" style="background:none; border:none; cursor:pointer; font-size:12px; color:#f87171">제외</button>
+            <button onclick="toggleManualTarget('${c.Phone}', 'exclude')" title="마케팅 명단에서 제외" style="background:none; border:none; cursor:pointer; font-size:16px; color:#f87171">×</button>
           </div>
         </div>
       `).join('');
@@ -994,6 +1050,91 @@ function animateValue(id, start, end, duration) {
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
 // ===== 초기화 =====
+// ===== 6. 모달 및 수정 로직 (Goal 1 & 2 보완) =====
+
+function openEditModal(phone) {
+  const c = getCustomers().find(x => x.Phone === phone);
+  if (!c) { showToast('고객 정보를 찾을 수 없습니다.'); return; }
+
+  const overlay = document.getElementById('modal-overlay');
+  const header = document.getElementById('modal-header');
+  const body = document.getElementById('modal-body');
+
+  header.innerHTML = `<h3>👤 고객 정보 수정</h3>`;
+  body.innerHTML = `
+    <div class="form-group">
+      <label class="form-label">고객 성함</label>
+      <input type="text" id="edit-name" class="form-input" value="${c.Name}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">연락처 (수정 시 주의)</label>
+      <input type="text" id="edit-phone" class="form-input" value="${c.Phone}">
+      <small style="color:var(--accent-danger); font-size:11px;">* 번호 변경 시 기존 방문 내역과 연결이 끊어질 수 있습니다.</small>
+    </div>
+    <div class="form-group">
+      <label class="form-label">활동 지역</label>
+      <input type="text" id="edit-region" class="form-input" value="${c.Region || ''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">성별</label>
+      <select id="edit-gender" class="form-input">
+        <option value="남성" ${c.Gender === '남성' ? 'selected' : ''}>남성</option>
+        <option value="여성" ${c.Gender === '여성' ? 'selected' : ''}>여성</option>
+      </select>
+    </div>
+    <button class="modal-save-btn" onclick="updateCustomerInfo('${c.Phone}')">💾 변경사항 저장</button>
+  `;
+
+  overlay.classList.add('active');
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
+async function updateCustomerInfo(oldPhone) {
+  const newName = document.getElementById('edit-name').value;
+  const newPhone = document.getElementById('edit-phone').value;
+  const newRegion = document.getElementById('edit-region').value;
+  const newGender = document.getElementById('edit-gender').value;
+
+  if (!newName || !newPhone) {
+    showToast('이름과 연락처는 필수 항목입니다.');
+    return;
+  }
+
+  const customers = getCustomers();
+  const cIdx = customers.findIndex(x => x.Phone === oldPhone);
+  
+  if (cIdx === -1) {
+    showToast('대상 고객을 찾을 수 없습니다.');
+    return;
+  }
+
+  // 데이터 업데이트
+  customers[cIdx].Name = newName;
+  customers[cIdx].Phone = newPhone;
+  customers[cIdx].Region = newRegion;
+  customers[cIdx].Gender = newGender;
+
+  // 만약 폰번호가 바뀌었다면 방문 내역의 폰번호도 업데이트해줘야 함 (데이터 무결성)
+  if (oldPhone !== newPhone) {
+    const visits = getVisits();
+    visits.forEach(v => {
+      if (v.Phone === oldPhone) v.Phone = newPhone;
+    });
+    await persistData({ visits });
+  }
+
+  showToast('고객 정보를 업데이트 중입니다...');
+  await saveCustomers(customers);
+  showToast('✅ 정보 수정이 완료되었습니다.');
+  
+  closeModal();
+  showPage('customers'); // 현재 페이지 새로고침 효과
+}
+
 window.onload = async () => {
   if (currentOwnerId) {
     document.body.classList.add('authenticated');

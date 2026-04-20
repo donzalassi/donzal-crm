@@ -343,9 +343,10 @@
         <div class="target-card vip-card">
           <div class="target-header">
             <div class="target-icon">👑</div>
-            <div>
-              <div class="target-title">VIP 타겟 마케팅</div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+              <div class="target-title">👑 VIP 타겟 마케팅</div>
               <div class="target-sub">최근 30일 3회↑ 또는 누적 20만원↑</div>
+              <button class="action-sm-btn" onclick="openTargetPicker('vip')" style="margin-top:5px; background:rgba(212, 175, 55, 0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">+ 직접 추가</button>
             </div>
           </div>
           <div class="target-list" id="vip-target-list"></div>
@@ -360,9 +361,10 @@
         <div class="target-card dormant-card">
           <div class="target-header">
             <div class="target-icon">💤</div>
-            <div>
-              <div class="target-title">휴면 타겟 마케팅</div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end;">
+              <div class="target-title">💤 휴면 타겟 마케팅</div>
               <div class="target-sub">마지막 방문 60일 이상 경과</div>
+              <button class="action-sm-btn" onclick="openTargetPicker('dormant')" style="margin-top:5px; background:rgba(59, 130, 246, 0.2); color:var(--accent-blue); border:1px solid var(--accent-blue); padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">+ 직접 추가</button>
             </div>
           </div>
           <div class="target-list" id="dormant-target-list"></div>
@@ -676,5 +678,28 @@
   </div>
 
   <script src="app.js"></script>
+
+  <!-- ===== 타겟 선택 모달 (Picker) ===== -->
+  <div class="modal" id="modal-target-picker">
+    <div class="modal-content" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 id="picker-title">🎯 대상 직접 추가</h3>
+        <button class="close-btn" onclick="closeModal('modal-target-picker')">&times;</button>
+      </div>
+      <div class="form-group" style="margin-bottom:15px;">
+        <input type="text" id="picker-search" class="form-input" placeholder="이름 또는 전화번호 검색..." oninput="renderPickerList()" />
+      </div>
+      <div id="picker-list" style="margin-top:10px; max-height:300px; overflow-y:auto; border:1px solid var(--border-color); border-radius:var(--radius-md); background:rgba(0,0,0,0.2);">
+        <!-- 검색 결과가 여기에 표시됨 -->
+      </div>
+      <div class="modal-footer" style="margin-top:20px; display:flex; justify-content:flex-end;">
+        <button class="cancel-btn" onclick="closeModal('modal-target-picker')">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 알림 메시지 (Toast) ===== -->
+  <div id="toast" class="toast"></div>
+
 </body>
 </html>

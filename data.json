@@ -70,6 +70,15 @@
       "Gender": "여성",
       "JoinDate": "2026-04-20",
       "ownerId": "owner_1"
+    },
+    {
+      "Phone": "010-2695-6897",
+      "Name": "BCTONE",
+      "Region": "서울",
+      "AgeGroup": "40대",
+      "Gender": "남성",
+      "JoinDate": "2026-04-20",
+      "ownerId": "owner_1"
     }
   ],
   "visits": [
@@ -90,6 +99,14 @@
       "ownerId": "owner_admin"
     },
     {
+      "VisitID": "V843571",
+      "Phone": "01090114620",
+      "VisitDate": "2026-04-20",
+      "SpendAmount": 48000,
+      "IsFirstVisit": true,
+      "ownerId": "owner_1"
+    },
+    {
       "ownerId": "owner_1",
       "VisitID": "V001",
       "Phone": "010-1234-5678",
@@ -98,10 +115,10 @@
       "IsFirstVisit": true
     },
     {
-      "VisitID": "V843571",
-      "Phone": "01090114620",
+      "VisitID": "V535278",
+      "Phone": "010-2695-6897",
       "VisitDate": "2026-04-20",
-      "SpendAmount": 48000,
+      "SpendAmount": 800,
       "IsFirstVisit": true,
       "ownerId": "owner_1"
     }
@@ -111,7 +128,16 @@
       "storeName": "돈잘베어 본점",
       "senderNumber": "01012345678",
       "apiKey": "",
-      "apiSecret": ""
+      "apiSecret": "",
+      "manualExclusions": [
+        "010-1234-5678"
+      ],
+      "manualInclusions": [
+        {
+          "phone": "01090114620",
+          "targetType": "vip"
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,6 @@
+node_modules
+.env
+data.json
+migrate_to_supabase.js
+debug_supabase.js
+.DS_Store
