@@ -21,6 +21,25 @@
       font-weight: 600;
       transition: all 0.3s;
     }
+    .app-version {
+      font-size: 11px;
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--accent-gold);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      margin-left: 8px;
+      font-family: monospace;
+      vertical-align: middle;
+    }
+
+    /* 타겟 명단 관련 보강 스타일 */
+    .t-item.manual {
+      background: rgba(212, 175, 55, 0.05);
+      border-left: 3px solid var(--accent-gold);
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
     .sync-online { background: #2f3e33; color: #4ade80; border: 1px solid #1e5c32; }
     .sync-offline { background: #3e2f2f; color: #f87171; border: 1px solid #5c1e1e; }
     .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
@@ -73,7 +92,7 @@
           <img src="donzal_bear.PNG" alt="돈잘베어" class="logo-image">
       </div>
       <div class="logo-text">
-        <span class="logo-title">돈잘<span>단골비서</span></span>
+        <span class="logo-title">돈잘<span>단골비서</span> <span class="app-version">a.04</span></span>
         <span class="logo-sub">Premium CRM SaaS</span>
       </div>
     </div>
@@ -354,7 +373,7 @@
             <div class="msg-label">발송 메시지 편집 ([이름] 사용 가능)</div>
             <textarea class="msg-content" id="target-msg-vip" style="width:100%; height:120px; padding:12px; border-radius:12px; border:1px solid rgba(212,175,55,0.2); background:rgba(212,175,55,0.05); color:#fff; font-family:inherit; font-size:14px; line-height:1.6; resize:none; margin-top:10px;"></textarea>
           </div>
-          <button class="target-send-btn" onclick="sendTargetSMS('vip')">📤 VIP 쿠폰 문자 발송</button>
+          <button class="target-send-btn" onclick="sendTargetSMS('vip', event)">📤 VIP 쿠폰 문자 발송</button>
         </div>
 
         <!-- 휴면 타겟 -->
@@ -372,7 +391,7 @@
             <div class="msg-label">발송 메시지 편집 ([이름] 사용 가능)</div>
             <textarea class="msg-content" id="target-msg-dormant" style="width:100%; height:120px; padding:12px; border-radius:12px; border:1px solid rgba(59,130,246,0.2); background:rgba(59,130,246,0.05); color:#fff; font-family:inherit; font-size:14px; line-height:1.6; resize:none; margin-top:10px;"></textarea>
           </div>
-          <button class="target-send-btn dormant-btn" onclick="sendTargetSMS('dormant')">📤 재방문 유도 문자 발송</button>
+          <button class="target-send-btn dormant-btn" onclick="sendTargetSMS('dormant', event)">📤 재방문 유도 문자 발송</button>
         </div>
       </div>
 
@@ -585,21 +604,6 @@
           </div>
         </div>
 
-        <div class="form-divider" style="margin-top:30px;">마케팅 메시지 템플릿 설정</div>
-        <div style="background:rgba(212,175,55,0.05); padding:15px; border-radius:8px; border-left:4px solid var(--accent-gold); font-size:13px; color:var(--text-muted); margin-bottom:15px; line-height:1.6;">
-          기본 메시지 내용을 자유롭게 수정하세요. 문자 발송 시 <b>[이름]</b> 부분은 자동으로 각 고객의 성함으로 바뀌어 전송됩니다.
-        </div>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label class="form-label">👑 VIP 타겟 메시지 (고객용)</label>
-            <textarea id="config-vip-template" class="form-input" style="height:100px; resize:vertical; padding:12px;" placeholder="[이름] 우수 고객님께! ..."></textarea>
-          </div>
-          <div class="form-group full-width">
-            <label class="form-label">💤 휴면 타겟 메시지 (컴백용)</label>
-            <textarea id="config-dormant-template" class="form-input" style="height:100px; resize:vertical; padding:12px;" placeholder="[이름] 보고 싶었어요! ..."></textarea>
-          </div>
-        </div>
-
         <button class="register-btn" onclick="saveConfig()" style="margin-top:40px; background:var(--accent-blue); color:#fff;">💾 변경사항 저장</button>
       </div>
     </div>
@@ -626,7 +630,7 @@
           <img src="donzal_bear.png" alt="돈잘베어">
         </div>
         <h1 class="logo-main">돈잘<span>단골비서</span></h1>
-        <p class="auth-subtitle">사장님만을 위한 똑똑한 마케팅 비서</p>
+        <p class="auth-subtitle">사장님만을 위한 똑똑한 마케팅 비서 (v.a.04)</p>
       </div>
 
       <!-- 로그인 폼 -->

@@ -10,7 +10,11 @@ function getCustomers() { return dbCustomers; }
 function getVisits() { return dbVisits; }
 function loadConfig() { return dbConfig; }
 
-const API_BASE = 'https://donzal-crm.onrender.com';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'http://localhost:3060' 
+  : 'https://donzal-crm.onrender.com';
+
+console.log(`현재 환경: ${window.location.hostname} / 연결 대상: ${API_BASE}`);
 
 // 데이터 서버 연동 (SaaS 방식)
 async function syncData() {
@@ -706,7 +710,7 @@ function updateTargetingPage() {
   }
 }
 
-async function sendTargetSMS(type) {
+async function sendTargetSMS(type, event) {
   const chkClass = type === 'vip' ? '.target-chk-vip' : '.target-chk-dormant';
   const checkedBoxes = Array.from(document.querySelectorAll(`${chkClass}:checked`)).map(el => el.value);
   

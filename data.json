@@ -138,6 +138,19 @@
           "targetType": "vip"
         }
       ]
+    },
+    "owner_admin": {
+      "storeName": "단골비서 매장",
+      "senderNumber": "",
+      "apiKey": "",
+      "apiSecret": "",
+      "manualExclusions": [],
+      "manualInclusions": [
+        {
+          "phone": "01090114620",
+          "targetType": "vip"
+        }
+      ]
     }
   }
 }
