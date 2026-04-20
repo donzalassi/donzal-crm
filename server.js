@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { msg } = require('coolsms-node-sdk');
 const path = require('path');
+const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
@@ -208,7 +209,7 @@ app.post('/api/auth/signup', async (req, res) => {
 
 // 5. 문자 발송 API
 app.post('/send-sms', async (req, res) => {
-  const { targets, text, config } = req.body; 
+  const { targets, text, config, ownerId, type } = req.body; 
   if (!targets || targets.length === 0 || !text) return res.status(400).json({ success: false, message: '데이터 부족' });
 
   msg.init({ apiKey: config.apiKey, apiSecret: config.apiSecret });
@@ -218,17 +219,59 @@ app.post('/send-sms', async (req, res) => {
     text: text.replace(/\[이름\]/g, t.name) 
   }));
 
+  let status = 'simulation';
+  let success = true;
+  let response = null;
+
   try {
-    if (config.apiKey === 'YOUR_API_KEY' || config.apiKey === '') {
-      return res.json({ success: true, message: '시뮬레이션 성공' });
+    if (config.apiKey !== 'YOUR_API_KEY' && config.apiKey !== '') {
+      response = await msg.send(messageList);
+      status = '발송완료';
+    } else {
+      status = '시뮬레이션 성공';
     }
-    const response = await msg.send(messageList);
-    res.json({ success: true, response });
   } catch (error) {
     console.error('SMS Send Error Details:', error);
-    // 솔라피 상세 에러 메시지가 있으면 그것을, 없으면 일반 에러를 보냅니다.
-    const errorMsg = error.errorMessage || error.message || '문자 발송 중 알 수 없는 오류 발생';
-    res.status(500).json({ success: false, message: errorMsg });
+    status = error.errorMessage || error.message || '오류 발생';
+    success = false;
+  }
+
+  // 로컬 data.json에 로그 기록
+  try {
+    const dataPath = path.join(__dirname, 'data.json');
+    const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    if (!localData.sms_logs) localData.sms_logs = [];
+    
+    localData.sms_logs.push({
+      ownerId,
+      type,
+      count: targets.length,
+      timestamp: new Date().toISOString(),
+      status,
+      message: text
+    });
+    
+    fs.writeFileSync(dataPath, JSON.stringify(localData, null, 2));
+  } catch (logErr) {
+    console.error('Logging to data.json failed:', logErr);
+  }
+
+  res.json({ success, status, response });
+});
+
+// 6. 문자 발송 이력 조회 API
+app.get('/api/sms/logs/:ownerId', (req, res) => {
+  try {
+    const { ownerId } = req.params;
+    const dataPath = path.join(__dirname, 'data.json');
+    if (!fs.existsSync(dataPath)) return res.json({ success: true, logs: [] });
+    
+    const localData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    const logs = (localData.sms_logs || []).filter(l => l.ownerId === ownerId);
+    
+    res.json({ success: true, logs });
+  } catch (e) {
+    res.status(500).json({ success: false, message: '로그 조회 중 오류 발생' });
   }
 });
 

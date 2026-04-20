@@ -217,6 +217,26 @@ function updateUIAfterSync() {
   
   // 처음 로그인 시 대시보드 렌더링
   updateDashboard();
+  loadSMSLogs(); // 과거 발송 이력 불러오기 추가
+}
+
+async function loadSMSLogs() {
+  if (!ownerId) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/sms/logs/${ownerId}`);
+    const data = await res.json();
+    if (data.success && data.logs) {
+      document.getElementById('send-log').innerHTML = ''; // 초기화
+      // 최신순으로 정렬하여 표시
+      data.logs.reverse().forEach(log => {
+        addLogToUI(log.type, log.count, log.status, 
+          log.status === '발송완료' || log.status === '시뮬레이션 성공' ? 'var(--accent-success)' : 'var(--accent-danger)', 
+          log.message, log.timestamp);
+      });
+    }
+  } catch (e) {
+    console.error('Failed to load SMS logs:', e);
+  }
 }
 
 // ===== 마케팅 로직 및 데이터 가공 =====
@@ -749,19 +769,21 @@ async function sendTargetSMS(type, event) {
     const res = await fetch(`${API_BASE}/send-sms`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        targets: targets.map(t => ({ name: t.Name, phone: t.Phone })),
-        text: text,
-        config: config
+      body: JSON.stringify({ 
+        type, 
+        targets: targets.map(t => ({ name: t.Name, phone: t.Phone })), 
+        message: text,
+        ownerId,
+        config: config 
       })
     });
     const data = await res.json();
     if (data.success) {
       showToast(`[성공] ${targetCount}명에게 문자 발송 요청 완료! 🎉`);
-      addLogToUI(type, targetCount, '발송완료', 'var(--accent-success)');
+      addLogToUI(type, targetCount, '발송완료', 'var(--accent-success)', text, new Date().toISOString());
     } else {
       showToast(`❌ 발송 실패: ${data.message}`);
-      addLogToUI(type, targetCount, `실패: ${data.message}`, 'var(--accent-danger)');
+      addLogToUI(type, targetCount, `실패: ${data.message}`, 'var(--accent-danger)', text, new Date().toISOString());
     }
   } catch(e) {
     showToast('🚨 백엔드 서버 연결 실패! 네트워크를 확인하세요.');
@@ -769,15 +791,19 @@ async function sendTargetSMS(type, event) {
   }
 }
 
-function addLogToUI(type, count, status, color) {
+function addLogToUI(type, count, status, color, messageContent = '', timestamp = null) {
   const log = document.getElementById('send-log');
   if (!log) return;
+  const shortMsg = messageContent ? (messageContent.length ? (messageContent.length > 20 ? messageContent.slice(0, 20) + '...' : messageContent) : '내용 없음') : '내용 없음';
+  
+  const displayTime = timestamp ? new Date(timestamp).toLocaleString() : new Date().toLocaleString();
   const el = document.createElement('div');
   el.className = 'log-item';
   el.innerHTML = `
     <div>
       <div style="font-weight:bold;margin-bottom:5px; color:${color}">${type==='vip'?'👑 VIP':'💤 휴면'} 캠페인</div>
-      <div style="font-size:12px;color:var(--text-muted)">${new Date().toLocaleString()} | 대상: ${count}명 | 결과: ${status}</div>
+      <div style="font-size:12px;color:var(--text-muted)">${displayTime} | 대상: ${count}명 | 결과: ${status}</div>
+      <div style="font-size:11px; color:#888; margin-top:4px;">"${shortMsg}"</div>
     </div>
     <span class="badge" style="background:${color}; color:#000; font-size:10px; padding:2px 8px; border-radius:4px;">${status}</span>
   `;
